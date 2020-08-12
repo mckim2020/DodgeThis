@@ -1,3 +1,7 @@
+from riotwatcher import LolWatcher, ApiError
+import pandas as pd
+    
+
 # check league's latest version
 latest = watcher.data_dragon.versions_for_region(myRegion)['n']['champion']
 # Lets get some champions static information
