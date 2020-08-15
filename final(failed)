@@ -1,0 +1,89 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+import torch.optim as optim
+
+from riotwatcher import LolWatcher, ApiError
+import pandas as pd
+
+# New Split Function
+def mySplit(str):
+    myList = str.split(",")
+    return myList[0].strip(), myList[1].strip()
+
+#Creating Net
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.pool = nn.MaxPool2d(2, 2)
+        #Kernel: 5 by 5
+        self.conv1 = nn.Conv2d(1, 6, 2)
+        self.conv2 = nn.Conv2d(6, 16, 2)
+
+        #Output
+        self.fc0 = nn.Linear(24, 40)
+        self.fc1 = nn.Linear(40, 10)
+        self.fc2 = nn.Linear(10, 2)
+        
+        def forward(self, x):
+        x = (F.relu(self.conv1(x)))
+#         x = self.pool(x)
+#         x = (F.relu(self.conv2(x)))
+#         x = self.pool(x)
+        x = x.view(-1, 24)
+        x = F.relu(self.fc0(x))
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
+        
+myNet = Net()
+
+
+# Create Loss Optimizer(SGD)
+optimizer = optim.SGD(myNet.parameters(), lr=0.01, momentum=0.9)
+criterion = nn.MSELoss()
+optimizer.zero_grad()
+
+
+# List of Train Tensors and Target Tensors
+trainList = []
+targetList = []
+
+# Data Reading
+f = open("LolData.csv", "r")
+ind = 0
+
+train = torch.zeros(1, 1, 2, 5)
+target = torch.zeros(1, 2)
+
+for line in f:
+    champNum, result = mySplit(line)
+
+    # train data
+    train[0, 0, ind//5, ind%5] = int(champNum)/100
+
+    # target data
+    if ind % 10 == 0 and result == 'True':
+        target[0, 0] = 1
+        target[0, 1] = 0
+
+    if ind % 10 == 0 and result == 'False':
+        target[0, 0] = 0
+        target[0, 1] = 1
+
+    # append data to the NET
+    if ind % 10 == 9:
+        print(train)
+        print(target)
+        output = myNet(train)
+        print(output)
+        loss = criterion(output, target)
+        loss.backward()
+        optimizer.step()
+
+
+    ind += 1
+    ind = ind % 10 # Refresh
+    
+    f.close()
