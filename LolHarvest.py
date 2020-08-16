@@ -7,7 +7,7 @@ import time
 #harvesting starts here
 # global variables
 
-api_key = 'RGAPI-86c34767-17f5-41e1-82b8-c59e5349f478'
+api_key = 메ㅑㅏ됴
 #api_url='https://kr.api.riotgames.com/lol/match/v4/matches/' + str(match_info_df2['gameId'].iloc[i]) + '?api_key=' + api_key
 watcher = LolWatcher(api_key)
 accountId = '1tl_YlUF1FBkFOHe2hMZkrFjQItv9XaYHjjgxmV88fUjJnM'
